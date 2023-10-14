@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PhotoSphereViewer - overlays cubemap demo</title>
+
+        <link rel="stylesheet" href="/dist/core/index.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="photosphere"></div>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/cubemap-adapter": "/dist/cubemap-adapter/index.module.js",
+                    "@photo-sphere-viewer/overlays-plugin": "/dist/overlays-plugin/index.module.js"
+                }
+            }
+        </script>
+
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { CubemapAdapter } from '@photo-sphere-viewer/cubemap-adapter';
+            import { OverlaysPlugin } from '@photo-sphere-viewer/overlays-plugin';
+
+            const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+            const viewer = new Viewer({
+                container: 'photosphere',
+                adapter: CubemapAdapter,
+                panorama: {
+                    left: baseUrl + 'cubemap/px.jpg',
+                    front: baseUrl + 'cubemap/nz.jpg',
+                    right: baseUrl + 'cubemap/nx.jpg',
+                    back: baseUrl + 'cubemap/pz.jpg',
+                    top: baseUrl + 'cubemap/py.jpg',
+                    bottom: baseUrl + 'cubemap/ny.jpg',
+                },
+                caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+                loadingImg: baseUrl + 'loader.gif',
+                plugins: [
+                    [OverlaysPlugin, {
+                        overlays: [
+                            {
+                                id: 'xray',
+                                path: {
+                                    left: baseUrl + 'cubemap-overlay/px.png',
+                                    front: baseUrl + 'cubemap-overlay/nz.png',
+                                    right: baseUrl + 'cubemap-overlay/nx.png',
+                                    back: baseUrl + 'cubemap-overlay/pz.png',
+                                    top: baseUrl + 'cubemap-overlay/py.png',
+                                    bottom: baseUrl + 'cubemap-overlay/ny.png',
+                                },
+                                opacity: .8,
+                                zIndex: 1,
+                            },
+                            // {
+                            //     id: 'xray',
+                            //     path: baseUrl + 'sphere-overlay.png',
+                            //     opacity: .8,
+                            //     zIndex: 1,
+                            // },
+                            {
+                                id: 'rick',
+                                path: baseUrl + 'pictos/rick.webm',
+                                type: 'video',
+                                yaw: 0,
+                                pitch: 0.19,
+                                width: 0.2,
+                                height: 0.4,
+                                zIndex: 3,
+                            },
+                        ],
+                    }],
+                ],
+            });
+
+            window.viewer = viewer;
+        </script>
+    </body>
+</html>

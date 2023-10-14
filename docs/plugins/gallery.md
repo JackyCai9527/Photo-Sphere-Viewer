@@ -106,8 +106,7 @@ gallery.setItems([
 
 #### `items`
 
--   type: `array`
--   default: `GalleryItem[]`
+-   type: `GalleryItem[]`
 -   updatable: no, use `setItems()` method
 
 The list of items, see bellow.

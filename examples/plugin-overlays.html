@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PhotoSphereViewer - overlays demo</title>
+
+        <link rel="stylesheet" href="/dist/core/index.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="photosphere"></div>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "randomcolor": "https://cdn.jsdelivr.net/npm/randomcolor/+esm",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/cubemap-adapter": "/dist/cubemap-adapter/index.module.js",
+                    "@photo-sphere-viewer/overlays-plugin": "/dist/overlays-plugin/index.module.js"
+                }
+            }
+        </script>
+
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { CubemapAdapter } from '@photo-sphere-viewer/cubemap-adapter';
+            import { OverlaysPlugin } from '@photo-sphere-viewer/overlays-plugin';
+            import randomColor from 'randomcolor';
+
+            const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+            const viewer = new Viewer({
+                container: 'photosphere',
+                panorama: baseUrl + 'sphere.jpg',
+                caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+                loadingImg: baseUrl + 'loader.gif',
+                plugins: [
+                    [OverlaysPlugin, {
+                        cubemapAdapter: CubemapAdapter,
+                        overlays: [
+                            {
+                                id: 'xray',
+                                path: baseUrl + 'sphere-overlay.png',
+                                opacity: .8,
+                                zIndex: 1,
+                            },
+                            {
+                                path: baseUrl + 'sphere-small.jpg',
+                                opacity: 0.5,
+                                yaw: -0.81,
+                                pitch: 0.19,
+                                width: 0.8,
+                                height: 0.4,
+                                zIndex: 2,
+                            },
+                            {
+                                id: 'rick',
+                                path: baseUrl + 'pictos/rick.webm',
+                                type: 'video',
+                                yaw: 0,
+                                pitch: 0.19,
+                                width: 0.2,
+                                height: 0.4,
+                                zIndex: 3,
+                            }
+                        ],
+                    }],
+                ],
+                navbar: [
+                    {
+                        className: 'custom-button',
+                        content: 'Sphere overlay',
+                        onClick: () => {
+                            overlays.clearOverlays();
+                            setSphereOverlay(baseUrl + 'sphere-overlay.png');
+                        },
+                    },
+                    {
+                        className: 'custom-button',
+                        content: 'Cubemap overlay',
+                        onClick: () => {
+                            overlays.clearOverlays();
+                            setCubemapOverlay({
+                                left: baseUrl + 'cubemap-overlay/px.png',
+                                front: baseUrl + 'cubemap-overlay/nz.png',
+                                right: baseUrl + 'cubemap-overlay/nx.png',
+                                back: baseUrl + 'cubemap-overlay/pz.png',
+                                top: baseUrl + 'cubemap-overlay/py.png',
+                                bottom: baseUrl + 'cubemap-overlay/ny.png',
+                            });
+                        },
+                    },
+                ],
+            });
+
+            const overlays = viewer.getPlugin('overlays');
+
+            overlays.addEventListener('overlay-click', ({overlayId}) => {
+                console.log(`click ${overlayId}`);
+                if (overlayId === 'rick') {
+                    const video = overlays.getVideo(overlayId);
+                    if (video.paused) {
+                        video.play();
+                    } else {
+                        video.pause();
+                    }
+                }
+            });
+
+            function setSphereOverlay(path) {
+                viewer.textureLoader.loadImage(path).then((image) => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = image.width;
+                    canvas.height = image.height;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.drawImage(image, 0, 0);
+
+                    ctx.globalCompositeOperation = 'source-in';
+                    ctx.fillStyle = randomColor({ luminosity: 'bright' });
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    overlays.addOverlay({
+                        id: 'xray',
+                        path: canvas.toDataURL(),
+                        zIndex: 1,
+                    });
+                });
+            }
+
+            function setCubemapOverlay(path) {
+                Promise.all(
+                    Object.entries(path).map(([name, url]) => {
+                        return viewer.textureLoader.loadImage(url).then((image) => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = image.width;
+                            canvas.height = image.height;
+                            const ctx = canvas.getContext('2d');
+
+                            ctx.drawImage(image, 0, 0);
+
+                            ctx.globalCompositeOperation = 'source-in';
+                            ctx.fillStyle = randomColor({ luminosity: 'bright' });
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                            return [name, canvas.toDataURL()];
+                        });
+                    })
+                ).then((images) => {
+                    overlays.addOverlay({
+                        id: 'xray',
+                        path: images.reduce((out, [name, url]) => ({ ...out, [name]: url }), {}),
+                        zIndex: 1,
+                    });
+                });
+            }
+
+            window.viewer = viewer;
+        </script>
+    </body>
+</html>

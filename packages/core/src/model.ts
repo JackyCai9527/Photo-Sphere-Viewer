@@ -151,11 +151,11 @@ export type PanoramaOptions = Partial<ExtendedPosition> & {
      */
     panoData?: PanoData | PanoDataProvider;
     /**
-     * new overlay to apply to the panorama
+     * @deprecated Use the `overlay` plugin instead
      */
     overlay?: any;
     /**
-     * new overlay opacity
+     * @deprecated Use the `overlay` plugin instead
      */
     overlayOpacity?: number;
 };
@@ -293,8 +293,9 @@ export type NavbarCustomButton = {
 export type ViewerConfig = {
     container: HTMLElement | string;
     panorama?: any;
+    /** @deprecated Use the `overlay` plugin instead */
     overlay?: any;
-    /** @default 1 */
+    /** @deprecated Use the `overlay` plugin instead */
     overlayOpacity?: number;
     /** @default equirectangular */
     adapter?: AdapterConstructor | [AdapterConstructor, any];

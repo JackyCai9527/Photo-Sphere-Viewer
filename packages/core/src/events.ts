@@ -202,6 +202,19 @@ export class LoadProgressEvent extends ViewerEvent {
 }
 
 /**
+ * @event Triggered when a panorama image starts loading
+ */
+export class PanoramaLoadEvent extends ViewerEvent {
+    static override readonly type = 'panorama-load';
+    override type: 'panorama-load';
+
+    /** @internal */
+    constructor(public readonly panorama: any) {
+        super(PanoramaLoadEvent.type);
+    }
+}
+
+/**
  * @event Triggered when a panorama image has been loaded
  */
 export class PanoramaLoadedEvent extends ViewerEvent {
@@ -442,6 +455,7 @@ export type ViewerEvents =
     | HideTooltipEvent
     | KeypressEvent
     | LoadProgressEvent
+    | PanoramaLoadEvent
     | PanoramaLoadedEvent
     | PanoramaErrorEvent
     | PositionUpdatedEvent

@@ -1,10 +1,10 @@
 import { MathUtils } from 'three';
+import { PSVError } from '../PSVError';
 import { adapterInterop } from '../adapters/AbstractAdapter';
 import { EquirectangularAdapter } from '../adapters/EquirectangularAdapter';
 import { ParsedViewerConfig, ReadonlyViewerConfig, ViewerConfig } from '../model';
 import { pluginInterop } from '../plugins/AbstractPlugin';
-import { PSVError } from '../PSVError';
-import { clone, ConfigParsers, getConfigParser, logWarn, parseAngle } from '../utils';
+import { ConfigParsers, clone, getConfigParser, logWarn, parseAngle } from '../utils';
 import { ACTIONS, KEY_CODES } from './constants';
 
 /**
@@ -243,6 +243,12 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
             logWarn(`Global canvasBackground is deprecated, it is now configured on the adapter.`);
         }
         return canvasBackground;
+    },
+    overlay: (overlay) => {
+        if (overlay !== null) {
+            logWarn(`"overlay" option is deprecated, use "@photo-sphere-viewer/overlay-plugin" instead.`);
+        }
+        return overlay;
     },
 };
 

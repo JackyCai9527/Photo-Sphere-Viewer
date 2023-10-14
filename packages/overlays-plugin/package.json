@@ -1,0 +1,22 @@
+{
+  "name": "@photo-sphere-viewer/overlays-plugin",
+  "version": "0.0.0",
+  "description": "Photo Sphere Viewer plugin to add various overlays over the panorama.",
+  "homepage": "https://photo-sphere-viewer.js.org/plugins/overlays",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@photo-sphere-viewer/core": "0.0.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "lint": "eslint . --fix",
+    "publish-dist": "cd dist && npm publish --tag=$NPM_TAG --access=public",
+    "npm-link": "cd dist && npm link"
+  },
+  "psv": {
+    "globalName": "PhotoSphereViewer.OverlaysPlugin"
+  }
+}

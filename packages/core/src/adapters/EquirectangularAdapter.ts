@@ -71,8 +71,8 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture, Pan
 
     private interpolationWorker: Worker;
 
-    private readonly SPHERE_SEGMENTS: number;
-    private readonly SPHERE_HORIZONTAL_SEGMENTS: number;
+    readonly SPHERE_SEGMENTS: number;
+    readonly SPHERE_HORIZONTAL_SEGMENTS: number;
 
     constructor(viewer: Viewer, config?: EquirectangularAdapterConfig) {
         super(viewer);
@@ -141,14 +141,15 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture, Pan
 
     async loadTexture(
         panorama: string,
-        newPanoData: PanoData | PanoDataProvider,
+        newPanoData?: PanoData | PanoDataProvider,
+        loader = true,
         useXmpPanoData = this.config.useXmpData
     ): Promise<EquirectangularTexture> {
         if (typeof panorama !== 'string') {
             return Promise.reject(new PSVError('Invalid panorama url, are you using the right adapter?'));
         }
 
-        const blob = await this.viewer.textureLoader.loadFile(panorama, (p) => this.viewer.loader.setProgress(p), panorama);
+        const blob = await this.viewer.textureLoader.loadFile(panorama, loader ? (p) => this.viewer.loader.setProgress(p) : null, panorama);
         const xmpPanoData = useXmpPanoData ? await this.loadXMP(blob) : null;
         const img = await this.viewer.textureLoader.blobToImage(blob);
 

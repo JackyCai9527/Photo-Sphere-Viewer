@@ -230,7 +230,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
 
         if (panorama.baseUrl) {
             return this.getAdapter()
-                .loadTexture(panorama.baseUrl, panorama.basePanoData)
+                .loadTexture(panorama.baseUrl, panorama.basePanoData, true, false)
                 .then((textureData) => ({
                     panorama,
                     panoData,

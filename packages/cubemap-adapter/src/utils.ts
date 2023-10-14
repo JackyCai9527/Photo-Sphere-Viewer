@@ -29,7 +29,7 @@ export function cleanCubemapArray<T>(panorama: T[]): T[] {
 }
 
 /**
- * Given an object where keys are faces names, retusn an array in 3JS order
+ * Given an object where keys are faces names, returns an array in 3JS order
  */
 export function cleanCubemap<T>(cubemap: { [K in CubemapFaces]: T }): T[] {
     const cleanPanorama: T[] = [];

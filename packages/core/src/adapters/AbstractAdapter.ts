@@ -21,7 +21,7 @@ export abstract class AbstractAdapter<TPanorama, TTexture, TData> {
     static readonly supportsDownload: boolean = false;
 
     /**
-     * Indicates if the adapter can display an additional transparent image above the panorama
+     * @deprecated
      */
     static readonly supportsOverlay: boolean = false;
 
@@ -83,6 +83,7 @@ export abstract class AbstractAdapter<TPanorama, TTexture, TData> {
     abstract loadTexture(
         panorama: TPanorama,
         newPanoData?: PanoData | PanoDataProvider,
+        loader?: boolean,
         useXmpPanoData?: boolean
     ): Promise<TextureData<TTexture, TPanorama, TData>>;
 
@@ -107,7 +108,7 @@ export abstract class AbstractAdapter<TPanorama, TTexture, TData> {
     abstract disposeTexture(textureData: TextureData<TTexture, TPanorama, TData>): void;
 
     /**
-     * Applies the overlay to the mesh
+     * @deprecated
      */
     // @ts-ignore unused parameter
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

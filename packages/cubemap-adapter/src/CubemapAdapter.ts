@@ -154,7 +154,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
         return { textureFace, textureX, textureY };
     }
 
-    async loadTexture(panorama: CubemapPanorama): Promise<CubemapTexture> {
+    async loadTexture(panorama: CubemapPanorama, _unused?: null, loader = true): Promise<CubemapTexture> {
         if (this.viewer.config.fisheye) {
             utils.logWarn('fisheye effect with cubemap texture can generate distorsion');
         }
@@ -172,15 +172,15 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
         let result: { textures: Texture[], flipTopBottom: boolean, cacheKey: string };
         switch (cleanPanorama.type) {
             case 'separate':
-                result = await this.loadTexturesSeparate(cleanPanorama);
+                result = await this.loadTexturesSeparate(cleanPanorama, loader);
                 break;
 
             case 'stripe':
-                result = await this.loadTexturesStripe(cleanPanorama);
+                result = await this.loadTexturesStripe(cleanPanorama, loader);
                 break;
 
             case 'net':
-                result = await this.loadTexturesNet(cleanPanorama);
+                result = await this.loadTexturesNet(cleanPanorama, loader);
                 break;
 
             default:
@@ -199,7 +199,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
         };
     }
 
-    private async loadTexturesSeparate(panorama: CubemapSeparate) {
+    private async loadTexturesSeparate(panorama: CubemapSeparate, loader: boolean) {
         let paths: string[];
         if (Array.isArray(panorama.paths)) {
             paths = cleanCubemapArray(panorama.paths as string[]);
@@ -214,10 +214,10 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
         for (let i = 0; i < 6; i++) {
             promises.push(
                 this.viewer.textureLoader
-                    .loadImage(paths[i], (p) => {
+                    .loadImage(paths[i], loader ? (p) => {
                         progress[i] = p;
                         this.viewer.loader.setProgress(utils.sum(progress) / 6);
-                    }, cacheKey)
+                    } : null, cacheKey)
                     .then((img) => this.createCubemapTexture(img))
             );
         }
@@ -256,13 +256,13 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
         return utils.createTexture(img);
     }
 
-    private async loadTexturesStripe(panorama: CubemapStripe) {
+    private async loadTexturesStripe(panorama: CubemapStripe, loader: boolean) {
         if (!panorama.order) {
             panorama.order = ['left', 'front', 'right', 'back', 'top', 'bottom'];
         }
 
         const cacheKey = panorama.path;
-        const img = await this.viewer.textureLoader.loadImage(panorama.path, (p) => this.viewer.loader.setProgress(p), cacheKey);
+        const img = await this.viewer.textureLoader.loadImage(panorama.path, loader ? (p) => this.viewer.loader.setProgress(p) : null, cacheKey);
 
         if (img.width !== img.height * 6) {
             utils.logWarn('Invalid cubemap image, the width should be six times the height');
@@ -302,9 +302,9 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
         };
     }
 
-    private async loadTexturesNet(panorama: CubemapNet) {
+    private async loadTexturesNet(panorama: CubemapNet, loader: boolean) {
         const cacheKey = panorama.path;
-        const img = await this.viewer.textureLoader.loadImage(panorama.path, (p) => this.viewer.loader.setProgress(p), cacheKey);
+        const img = await this.viewer.textureLoader.loadImage(panorama.path, loader ? (p) => this.viewer.loader.setProgress(p) : null, cacheKey);
 
         if (img.width / 4 !== img.height / 3) {
             utils.logWarn('Invalid cubemap image, the width should be 4/3rd of the height');
